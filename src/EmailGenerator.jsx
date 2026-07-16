@@ -156,14 +156,16 @@ function releaseCardHtml(r, primary, accent, sand) {
           <tr>
             ${
               r.coverArtUrl
-                ? `<td valign="top" width="50%" style="width:50%;padding-right:12px;">
+                ? `<td valign="top" width="${r.coverArtWidth || 50}%" style="width:${
+                    r.coverArtWidth || 50
+                  }%;padding-right:12px;">
                     <img src="${escapeAttr(r.coverArtUrl)}" alt="${escapeAttr(
                     r.title
                   )} cover art" style="display:block;width:100%;height:auto;border-radius:10px;background-color:${sand};" />
                   </td>`
                 : ""
             }
-            <td valign="top" style="width:${r.coverArtUrl ? "50%" : "100%"};">
+            <td valign="top" style="width:${r.coverArtUrl ? `${100 - (r.coverArtWidth || 50)}%` : "100%"};">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 ${metaRow("Release date", r.releaseDate, sand)}
                 ${metaRow("Label", r.label, sand)}
@@ -193,10 +195,11 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
   const cream = "#F7F4EC";
   const sand = "#F1F0E9";
 
+  const logoH = f.logoHeight || 28;
   const logoCell = f.logoImageUrl
     ? `<img src="${escapeAttr(f.logoImageUrl)}" alt="${escapeAttr(
         f.companyName
-      )}" height="28" style="display:block;height:28px;width:auto;" />`
+      )}" height="${logoH}" style="display:block;height:${logoH}px;width:auto;" />`
     : `<span style="font-family:'Maax Unicase',Arial,Helvetica,sans-serif;font-weight:700;font-size:19px;letter-spacing:0.5px;color:${primary};text-transform:uppercase;">${escapeHtml(
         f.companyName
       )}</span>`;
@@ -266,9 +269,7 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
                   f.dspLogoUrl
                     ? `<img src="${escapeAttr(f.dspLogoUrl)}" alt="${escapeAttr(
                         f.dspName
-                      )}" style="display:block;height:${Math.round(
-                        42 * (DSP_LOGO_SCALE[f.dspName] || 1)
-                      )}px;width:auto;" />`
+                      )}" style="display:block;height:${f.dspLogoHeight || 42}px;width:auto;" />`
                     : `<h1 class="headline" style="margin:0;font-family:'Maax Unicase',Arial,Helvetica,sans-serif;font-weight:700;font-size:34px;line-height:1.05;color:${primary};text-transform:uppercase;">For ${escapeHtml(
                         f.dspName
                       )}</h1>`
@@ -359,6 +360,7 @@ const defaultReleases = [
     artist: "JAY1, Hans Glader",
     album: "",
     coverArtUrl: "https://images.unsplash.com/photo-1516873240891-4bf014598ab4?w=400",
+    coverArtWidth: 50,
     genre: "Electronic / Dance / Hip-Hop",
     releaseDate: "7/24/2026",
     label: "Duetti",
@@ -374,6 +376,7 @@ const defaultReleases = [
     artist: "Bezz Believe",
     album: "Country Trapper 3 (Salt Water)",
     coverArtUrl: "https://images.unsplash.com/photo-1454922915609-78549ad709bb?w=400",
+    coverArtWidth: 50,
     genre: "Country Rap",
     releaseDate: "7/31/2026",
     label: "Duetti",
@@ -388,8 +391,10 @@ const defaultReleases = [
 const initial = {
   companyName: "Duetti",
   logoImageUrl: DUETTI_LOGO_DATA_URI,
+  logoHeight: 28,
   dspName: "TIDAL",
   dspLogoUrl: "",
+  dspLogoHeight: 42,
   contactName: "**[Contact Name]**",
   subjectLine: "Priority release pitch for TIDAL",
   preheaderText: "Two upcoming Duetti releases for TIDAL's consideration",
@@ -454,6 +459,25 @@ function CopyButton({ value }) {
       {copied ? <Check size={13} /> : <Copy size={13} />}
       {copied ? "Copied" : "Copy"}
     </button>
+  );
+}
+
+function SizeControl({ label, value, onChange, min, max, unit = "px tall" }) {
+  return (
+    <div style={{ marginBottom: 14, marginTop: -6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <label style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#17422C" }}>{label}</label>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, color: "#9AA69E" }}>{value}{unit}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ width: "100%", marginTop: 6, accentColor: "#17422C" }}
+      />
+    </div>
   );
 }
 
@@ -577,6 +601,16 @@ function ReleaseForm({ r, onChange, onRemove, canRemove, idx }) {
         </Field>
       </div>
       <ImageField label="Cover art" hint="optional — shown beside the metadata" value={r.coverArtUrl} onChange={(v) => onChange({ ...r, coverArtUrl: v })} />
+      {r.coverArtUrl && (
+        <SizeControl
+          label="Cover art size"
+          value={r.coverArtWidth || 50}
+          min={25}
+          max={65}
+          unit="% of card width"
+          onChange={(v) => onChange({ ...r, coverArtWidth: v })}
+        />
+      )}
       <div>
         <Field label="Release date">
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -634,6 +668,7 @@ export default function EmailGenerator() {
           artist: "Artist name",
           album: "",
           coverArtUrl: "",
+          coverArtWidth: 50,
           genre: "Genre",
           releaseDate: "",
           label: prev.companyName,
@@ -727,6 +762,13 @@ export default function EmailGenerator() {
             value={f.logoImageUrl}
             onChange={(v) => setF((prev) => ({ ...prev, logoImageUrl: v }))}
           />
+          <SizeControl
+            label="Logo size"
+            value={f.logoHeight}
+            min={14}
+            max={56}
+            onChange={(v) => setF((prev) => ({ ...prev, logoHeight: v }))}
+          />
           <Field label="DSP" hint="pick one, or type your own below">
             <select
               style={{ ...inputStyle, cursor: "pointer" }}
@@ -734,7 +776,12 @@ export default function EmailGenerator() {
               onChange={(e) => {
                 const name = e.target.value;
                 if (!name) return;
-                setF((prev) => ({ ...prev, dspName: name, dspLogoUrl: DSP_LOGOS[name] }));
+                setF((prev) => ({
+                  ...prev,
+                  dspName: name,
+                  dspLogoUrl: DSP_LOGOS[name],
+                  dspLogoHeight: Math.round(42 * (DSP_LOGO_SCALE[name] || 1)),
+                }));
               }}
             >
               <option value="">Custom / other…</option>
@@ -753,6 +800,13 @@ export default function EmailGenerator() {
             hint="auto-filled by the dropdown above, or upload your own"
             value={f.dspLogoUrl}
             onChange={(v) => setF((prev) => ({ ...prev, dspLogoUrl: v }))}
+          />
+          <SizeControl
+            label="DSP logo size"
+            value={f.dspLogoHeight}
+            min={20}
+            max={80}
+            onChange={(v) => setF((prev) => ({ ...prev, dspLogoHeight: v }))}
           />
           <div style={{ display: "flex", gap: 14 }}>
             <div style={{ flex: 1 }}>
