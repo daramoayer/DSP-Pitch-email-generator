@@ -386,7 +386,7 @@ const defaultReleases = [
 ];
 
 const initial = {
-  companyName: "Duetti Music",
+  companyName: "Duetti",
   logoImageUrl: DUETTI_LOGO_DATA_URI,
   dspName: "TIDAL",
   dspLogoUrl: "",
@@ -397,8 +397,8 @@ const initial = {
     'Hope you\'re doing well! Wanted to share two upcoming priority releases from the Duetti catalog for TIDAL\'s consideration. First is **Bezz Believe\'s "Outlaw Country"** from his upcoming album **Country Trapper 3 (Salt Water)**, a Country Rap release backed by a robust visual and fan engagement campaign. We\'re also excited about **"TIPSY"** from **JAY1 and Hans Glader**, a feel-good Electronic / Dance / Hip-Hop collaboration with strong summer playlist potential. Additional context, marketing plans, and listening links for both releases are below.',
   closingText: "Let me know your thoughts, and happy to send over anything else that would help with consideration.",
   senderName: "[Your Name]",
-  footerLeftText: "Duetti Music · DSP Partnerships",
-  footerRightText: "Confidential",
+  footerLeftText: "Duetti · DSP Partnerships",
+  footerRightText: "",
   primaryColor: "#17422C",
   accentColor: "#D0F148",
   releases: defaultReleases,
