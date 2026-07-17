@@ -179,11 +179,21 @@ function releaseCardHtml(r, primary, accent, sand) {
         <p style="margin:0 0 18px 0;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:14px;line-height:21px;color:#3A443F;">${richText(
           r.description
         )}</p>
-        <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background-color:${primary};border-radius:20px;">
-          <a href="${escapeAttr(
-            r.listeningLink
-          )}" style="display:inline-block;padding:11px 22px;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:12.5px;font-weight:800;letter-spacing:0.4px;color:#FFFFFF;text-decoration:none;text-transform:uppercase;">&#9654;&nbsp; Listening link</a>
-        </td></tr></table>
+        <div>
+          ${(r.links || [])
+            .filter((link) => link.url)
+            .map(
+              (link) =>
+                `<table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 8px 8px 0;"><tr><td style="background-color:${primary};border-radius:20px;">
+                  <a href="${escapeAttr(
+                    link.url
+                  )}" style="display:inline-block;padding:11px 22px;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:12.5px;font-weight:800;letter-spacing:0.4px;color:#FFFFFF;text-decoration:none;text-transform:uppercase;">&#9654;&nbsp; ${escapeHtml(
+                  link.label
+                )}</a>
+                </td></tr></table>`
+            )
+            .join("")}
+        </div>
       </td></tr>
     </table>
   </td></tr>`;
@@ -368,7 +378,7 @@ const defaultReleases = [
     isrc: "QZAKB2573543",
     description:
       '"Tipsy" is an upcoming collaboration between Jay1 and Hans Glader, blending house production with an easygoing, feel-good energy. The pairing brings something distinct to the table: Jay1\'s presence adds crossover appeal beyond the traditional house audience, while Hans Glader\'s production keeps the track rooted in a chill, sun-soaked house sound. This would be a strong fit for UK Garage, chill house, summer/pool, or "day party" playlists.',
-    listeningLink: "https://example.com/listen/tipsy",
+    links: [{ id: "l1", label: "Listening link", url: "https://example.com/listen/tipsy" }],
   },
   {
     id: "r2",
@@ -384,7 +394,7 @@ const defaultReleases = [
     isrc: "QZAKB2571716",
     description:
       'Florida rapper Bezz Believe has built his audience entirely independently, with collabs alongside Lil Wayne, Kevin Gates, and Gucci Mane. "Outlaw Country" is leading the charge of his new album "Country Trapper 3 (Salt Water)." Multiple music videos, lyric videos, and visualizers, as well as fan giveaways and challenges, will be executed to drive the marketing for the release. This track is a strong fit for any country rap playlists.',
-    listeningLink: "https://example.com/listen/outlaw-country",
+    links: [{ id: "l2", label: "Listening link", url: "https://example.com/listen/outlaw-country" }],
   },
 ];
 
@@ -640,9 +650,48 @@ function ReleaseForm({ r, onChange, onRemove, canRemove, idx }) {
       <Field label="Description" hint="** for bold **">
         <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 80 }} value={r.description} onChange={set("description")} />
       </Field>
-      <Field label="Listening link">
-        <input style={inputStyle} value={r.listeningLink} onChange={set("listeningLink")} />
-      </Field>
+
+      <label style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#17422C", display: "block", marginBottom: 5 }}>
+        Media links
+      </label>
+      {(r.links || []).map((link, i) => (
+        <div key={link.id} style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
+          <input
+            style={{ ...inputStyle, width: 110, flexShrink: 0 }}
+            value={link.label}
+            placeholder="Button title"
+            onChange={(e) =>
+              onChange({ ...r, links: r.links.map((l) => (l.id === link.id ? { ...l, label: e.target.value } : l)) })
+            }
+          />
+          <input
+            style={{ ...inputStyle, minWidth: 0, flex: 1 }}
+            value={link.url}
+            placeholder="https://..."
+            onChange={(e) =>
+              onChange({ ...r, links: r.links.map((l) => (l.id === link.id ? { ...l, url: e.target.value } : l)) })
+            }
+          />
+          {r.links.length > 1 && (
+            <button
+              type="button"
+              onClick={() => onChange({ ...r, links: r.links.filter((l) => l.id !== link.id) })}
+              style={{ border: "none", background: "none", cursor: "pointer", color: "#B5544A", flexShrink: 0, display: "flex" }}
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() =>
+          onChange({ ...r, links: [...(r.links || []), { id: `l${Date.now()}`, label: "Music video", url: "" }] })
+        }
+        style={{ display: "flex", alignItems: "center", gap: 5, fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#17422C", background: "#EFF3EC", border: "1px dashed #17422C", borderRadius: 6, padding: "7px 10px", cursor: "pointer", marginBottom: 4 }}
+      >
+        <Plus size={13} /> Add another link
+      </button>
     </div>
   );
 }
@@ -675,7 +724,7 @@ export default function EmailGenerator() {
           upc: "",
           isrc: "",
           description: "",
-          listeningLink: "",
+          links: [{ id: `l${Date.now()}`, label: "Listening link", url: "" }],
         },
       ],
     }));
