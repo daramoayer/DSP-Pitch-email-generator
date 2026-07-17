@@ -96,19 +96,6 @@ function fileToResizedDataUrl(file, maxDim = 480, quality = 0.82) {
   });
 }
 
-// bulletproof concentric-ring mark, built from nested tables so it
-// never depends on an image or SVG loading
-function ringMark(primary, size = 34) {
-  const s1 = size,
-    s2 = Math.round(size * 0.62),
-    s3 = Math.round(size * 0.26);
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="width:${s1}px;height:${s1}px;"><tr><td align="center" valign="middle" style="width:${s1}px;height:${s1}px;border-radius:50%;border:2px solid ${primary};">
-    <table role="presentation" cellpadding="0" cellspacing="0" style="width:${s2}px;height:${s2}px;"><tr><td align="center" valign="middle" style="width:${s2}px;height:${s2}px;border-radius:50%;border:2px solid ${primary};">
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:${s3}px;height:${s3}px;"><tr><td style="width:${s3}px;height:${s3}px;border-radius:50%;background-color:${primary};font-size:1px;line-height:1px;">&nbsp;</td></tr></table>
-    </td></tr></table>
-  </td></tr></table>`;
-}
-
 function metaRow(label, value, sand) {
   if (!value) return "";
   return `<tr><td style="padding:0 0 5px 0;">
@@ -127,7 +114,7 @@ function metaRow(label, value, sand) {
   </td></tr>`;
 }
 
-function releaseCardHtml(r, primary, accent, sand) {
+function releaseCardHtml(r, primary, accent, sand, dspName) {
   const artistLine = r.album
     ? `${escapeHtml(r.artist)} <span style="color:#8A9691;">&middot; from ${escapeHtml(r.album)}</span>`
     : escapeHtml(r.artist);
@@ -171,6 +158,8 @@ function releaseCardHtml(r, primary, accent, sand) {
                 ${metaRow("Label", r.label, sand)}
                 ${metaRow("UPC", r.upc, sand)}
                 ${metaRow("ISRC", r.isrc, sand)}
+                ${dspName === "Spotify" ? metaRow("Spotify URI", r.spotifyUri, sand) : ""}
+                ${dspName === "Apple Music" ? metaRow("Apple ID", r.appleId, sand) : ""}
               </table>
             </td>
           </tr>
@@ -223,7 +212,7 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
     )
     .join("\n            ");
 
-  const releaseCards = f.releases.map((r) => releaseCardHtml(r, primary, accent, sand)).join("\n");
+  const releaseCards = f.releases.map((r) => releaseCardHtml(r, primary, accent, sand, f.dspName)).join("\n");
 
   const preheaderPad = Array(60).fill("&zwnj;&nbsp;").join("");
 
@@ -263,12 +252,7 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
 
             <tr>
               <td class="mobile-padding" style="padding:0 12px 22px 12px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td valign="middle" align="left">${logoCell}</td>
-                    <td valign="middle" align="right">${ringMark(primary, 34)}</td>
-                  </tr>
-                </table>
+                ${logoCell}
               </td>
             </tr>
 
@@ -376,6 +360,8 @@ const defaultReleases = [
     label: "Duetti",
     upc: "199384493963",
     isrc: "QZAKB2573543",
+    spotifyUri: "spotify:track:",
+    appleId: "",
     description:
       '"Tipsy" is an upcoming collaboration between Jay1 and Hans Glader, blending house production with an easygoing, feel-good energy. The pairing brings something distinct to the table: Jay1\'s presence adds crossover appeal beyond the traditional house audience, while Hans Glader\'s production keeps the track rooted in a chill, sun-soaked house sound. This would be a strong fit for UK Garage, chill house, summer/pool, or "day party" playlists.',
     links: [{ id: "l1", label: "Listening link", url: "https://example.com/listen/tipsy" }],
@@ -392,6 +378,8 @@ const defaultReleases = [
     label: "Duetti",
     upc: "199384466455",
     isrc: "QZAKB2571716",
+    spotifyUri: "spotify:track:",
+    appleId: "",
     description:
       'Florida rapper Bezz Believe has built his audience entirely independently, with collabs alongside Lil Wayne, Kevin Gates, and Gucci Mane. "Outlaw Country" is leading the charge of his new album "Country Trapper 3 (Salt Water)." Multiple music videos, lyric videos, and visualizers, as well as fan giveaways and challenges, will be executed to drive the marketing for the release. This track is a strong fit for any country rap playlists.',
     links: [{ id: "l2", label: "Listening link", url: "https://example.com/listen/outlaw-country" }],
@@ -582,7 +570,7 @@ function SectionTitle({ children }) {
   );
 }
 
-function ReleaseForm({ r, onChange, onRemove, canRemove, idx }) {
+function ReleaseForm({ r, onChange, onRemove, canRemove, idx, dspName }) {
   const set = (k) => (e) => onChange({ ...r, [k]: e.target.value });
   return (
     <div style={{ border: "1px solid #E3E0D5", borderRadius: 10, padding: 14, marginBottom: 14, background: "#FFFFFF" }}>
@@ -646,6 +634,22 @@ function ReleaseForm({ r, onChange, onRemove, canRemove, idx }) {
             <CopyButton value={r.isrc} />
           </div>
         </Field>
+        {dspName === "Spotify" && (
+          <Field label="Spotify URI">
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <input style={{ ...inputStyle, minWidth: 0, flex: 1 }} value={r.spotifyUri} onChange={set("spotifyUri")} placeholder="spotify:track:..." />
+              <CopyButton value={r.spotifyUri} />
+            </div>
+          </Field>
+        )}
+        {dspName === "Apple Music" && (
+          <Field label="Apple ID">
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <input style={{ ...inputStyle, minWidth: 0, flex: 1 }} value={r.appleId} onChange={set("appleId")} />
+              <CopyButton value={r.appleId} />
+            </div>
+          </Field>
+        )}
       </div>
       <Field label="Description" hint="** for bold **">
         <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 80 }} value={r.description} onChange={set("description")} />
@@ -723,6 +727,8 @@ export default function EmailGenerator() {
           label: prev.companyName,
           upc: "",
           isrc: "",
+          spotifyUri: "",
+          appleId: "",
           description: "",
           links: [{ id: `l${Date.now()}`, label: "Listening link", url: "" }],
         },
@@ -902,6 +908,7 @@ export default function EmailGenerator() {
               key={r.id}
               r={r}
               idx={i}
+              dspName={f.dspName}
               canRemove={f.releases.length > 1}
               onChange={(updated) => updateRelease(r.id, updated)}
               onRemove={() => removeRelease(r.id)}
