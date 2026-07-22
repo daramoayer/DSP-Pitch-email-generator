@@ -12,10 +12,11 @@ const MAAX_B64 = "d09GMgABAAAAAGuwABEAAAABJSQAAGtNAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA
 const FONT_FACE_MAAX = `@font-face{font-family:'Maax Unicase';src:url(data:font/woff2;base64,${MAAX_B64}) format('woff2');font-weight:700;font-style:normal;font-display:swap;}`;
 const NUNITO_LINK = "https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap";
 
-// Duetti's own logo, embedded once so it doesn't need to be re-uploaded
-// for every pitch. Downsized/quantized to ~18KB so it barely dents
-// Gmail's ~102KB clip budget. Swap or clear it in the form any time.
-const DUETTI_LOGO_DATA_URI = "data:image/png;base64,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";
+// Duetti's own logo, embedded once so it defaults into every new pitch
+// without needing to be re-uploaded. Downsized + palette-quantized to ~9KB
+// so it barely dents Gmail's ~102KB clip budget. Swap or clear it in the
+// form any time.
+const DUETTI_LOGO_DATA_URI = "data:image/png;base64,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";
 
 // DSP logos, embedded the same way — pick one from the dropdown instead
 // of hunting down and uploading a logo file every time. Only the ONE
@@ -59,12 +60,6 @@ const escapeAttr = (str = "") => escapeHtml(str).replace(/\n/g, " ");
 // form (e.g. "Hey **[Contact Name]**,") can carry emphasis into the email
 const richText = (str = "") =>
   escapeHtml(str).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-const paragraphs = (text = "") =>
-  text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
 
 // Reads an uploaded image file, downsizes it, and returns a compact
 // base64 data URL — keeps embedded logos/cover art from blowing past
@@ -203,18 +198,7 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
         f.companyName
       )}</span>`;
 
-  const introParas = paragraphs(f.introText)
-    .map(
-      (p) =>
-        `<p style="margin:0 0 16px 0;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:15px;line-height:23px;color:#3A443F;">${richText(
-          p
-        )}</p>`
-    )
-    .join("\n            ");
-
   const releaseCards = f.releases.map((r) => releaseCardHtml(r, primary, accent, sand, f.dspName)).join("\n");
-
-  const preheaderPad = Array(60).fill("&zwnj;&nbsp;").join("");
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -224,7 +208,7 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>${escapeHtml(f.subjectLine)}</title>
+<title>Priority release pitch</title>
 <link rel="stylesheet" href="${NUNITO_LINK}">
 <style>
   ${FONT_FACE_MAAX}
@@ -241,9 +225,6 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:${cream};">
-  <div style="display:none;font-size:1px;color:${cream};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
-    ${escapeHtml(f.preheaderText)}${preheaderPad}
-  </div>
   <center>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${cream};">
       <tr>
@@ -260,38 +241,21 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
               <td class="mobile-padding" style="padding:0 12px 22px 12px;">
                 <div style="font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.4px;color:${primary};text-transform:uppercase;margin-bottom:8px;">Priority releases</div>
                 ${
-                  f.dspLogoUrl
+                  f.useDspLogo && f.dspLogoUrl
                     ? `<img src="${escapeAttr(f.dspLogoUrl)}" alt="${escapeAttr(
                         f.dspName
                       )}" style="display:block;height:${f.dspLogoHeight || 42}px;width:auto;" />`
-                    : `<h1 class="headline" style="margin:0;font-family:'Maax Unicase',Arial,Helvetica,sans-serif;font-weight:700;font-size:34px;line-height:1.05;color:${primary};text-transform:uppercase;">For ${escapeHtml(
-                        f.dspName
-                      )}</h1>`
+                    : ""
                 }
                 <div style="border-top:2.5px solid ${primary};margin:16px 0 20px 0;"></div>
-                <p style="margin:0 0 16px 0;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:15px;line-height:23px;color:#3A443F;">Hey ${richText(
-                  f.contactName
-                )},</p>
-                ${introParas}
               </td>
             </tr>
 
             <tr>
-              <td class="mobile-padding" style="padding:0 12px;">
+              <td class="mobile-padding" style="padding:0 12px 20px 12px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   ${releaseCards}
                 </table>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="mobile-padding" style="padding:4px 12px 28px 12px;">
-                <p style="margin:0 0 20px 0;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:15px;line-height:23px;color:#3A443F;">${richText(
-                  f.closingText
-                )}</p>
-                <p style="margin:0;font-family:'Nunito',Verdana,Geneva,sans-serif;font-size:15px;line-height:21px;color:#3A443F;">Best,<br>${escapeHtml(
-                  f.senderName
-                )}<br>${escapeHtml(f.companyName)}</p>
               </td>
             </tr>
 
@@ -347,60 +311,35 @@ function buildEmailHtml(f, { forPreview = false } = {}) {
 
 // ---------------- default content (from the sample) ----------------
 
-const defaultReleases = [
-  {
-    id: "r1",
-    title: "TIPSY",
-    artist: "JAY1, Hans Glader",
-    album: "",
-    coverArtUrl: "https://images.unsplash.com/photo-1516873240891-4bf014598ab4?w=400",
-    coverArtWidth: 50,
-    genre: "Electronic / Dance / Hip-Hop",
-    releaseDate: "7/24/2026",
-    label: "Duetti",
-    upc: "199384493963",
-    isrc: "QZAKB2573543",
-    spotifyUri: "spotify:track:",
-    appleId: "",
-    description:
-      '"Tipsy" is an upcoming collaboration between Jay1 and Hans Glader, blending house production with an easygoing, feel-good energy. The pairing brings something distinct to the table: Jay1\'s presence adds crossover appeal beyond the traditional house audience, while Hans Glader\'s production keeps the track rooted in a chill, sun-soaked house sound. This would be a strong fit for UK Garage, chill house, summer/pool, or "day party" playlists.',
-    links: [{ id: "l1", label: "Listening link", url: "https://example.com/listen/tipsy" }],
-  },
-  {
-    id: "r2",
-    title: "Outlaw Country",
-    artist: "Bezz Believe",
-    album: "Country Trapper 3 (Salt Water)",
-    coverArtUrl: "https://images.unsplash.com/photo-1454922915609-78549ad709bb?w=400",
-    coverArtWidth: 50,
-    genre: "Country Rap",
-    releaseDate: "7/31/2026",
-    label: "Duetti",
-    upc: "199384466455",
-    isrc: "QZAKB2571716",
-    spotifyUri: "spotify:track:",
-    appleId: "",
-    description:
-      'Florida rapper Bezz Believe has built his audience entirely independently, with collabs alongside Lil Wayne, Kevin Gates, and Gucci Mane. "Outlaw Country" is leading the charge of his new album "Country Trapper 3 (Salt Water)." Multiple music videos, lyric videos, and visualizers, as well as fan giveaways and challenges, will be executed to drive the marketing for the release. This track is a strong fit for any country rap playlists.',
-    links: [{ id: "l2", label: "Listening link", url: "https://example.com/listen/outlaw-country" }],
-  },
-];
+const blankRelease = () => ({
+  id: `r${Date.now()}`,
+  title: "",
+  artist: "",
+  album: "",
+  coverArtUrl: "",
+  coverArtWidth: 50,
+  genre: "",
+  releaseDate: "",
+  label: "",
+  upc: "",
+  isrc: "",
+  spotifyUri: "",
+  appleId: "",
+  description: "",
+  links: [{ id: `l${Date.now()}`, label: "", url: "" }],
+});
+
+const defaultReleases = [blankRelease()];
 
 const initial = {
   companyName: "Duetti",
   logoImageUrl: DUETTI_LOGO_DATA_URI,
   logoHeight: 28,
-  dspName: "TIDAL",
+  dspName: "",
+  useDspLogo: false,
   dspLogoUrl: "",
   dspLogoHeight: 42,
-  contactName: "**[Contact Name]**",
-  subjectLine: "Priority release pitch for TIDAL",
-  preheaderText: "Two upcoming Duetti releases for TIDAL's consideration",
-  introText:
-    'Hope you\'re doing well! Wanted to share two upcoming priority releases from the Duetti catalog for TIDAL\'s consideration. First is **Bezz Believe\'s "Outlaw Country"** from his upcoming album **Country Trapper 3 (Salt Water)**, a Country Rap release backed by a robust visual and fan engagement campaign. We\'re also excited about **"TIPSY"** from **JAY1 and Hans Glader**, a feel-good Electronic / Dance / Hip-Hop collaboration with strong summer playlist potential. Additional context, marketing plans, and listening links for both releases are below.',
-  closingText: "Let me know your thoughts, and happy to send over anything else that would help with consideration.",
-  senderName: "[Your Name]",
-  footerLeftText: "Duetti · DSP Partnerships",
+  footerLeftText: "",
   footerRightText: "",
   primaryColor: "#17422C",
   accentColor: "#D0F148",
@@ -758,15 +697,13 @@ export default function EmailGenerator() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(f.subjectLine || "pitch").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.html`;
+    const namePart = f.dspName || f.releases[0]?.title || "pitch";
+    a.download = `${namePart.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.html`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
   };
-
-  const preSub = f.subjectLine || "(no subject)";
-  const prePre = f.preheaderText || "";
 
   return (
     <div style={{ background: "#F7F4EC", minHeight: "100vh", fontFamily: "Nunito, sans-serif" }}>
@@ -808,9 +745,6 @@ export default function EmailGenerator() {
         {/* form */}
         <div style={{ width: 440, flexShrink: 0, padding: "10px 26px 60px 26px", maxHeight: "calc(100vh - 62px)", overflowY: "auto" }}>
           <SectionTitle>Sender &amp; subject</SectionTitle>
-          <Field label="Company / label name">
-            <input style={inputStyle} value={f.companyName} onChange={set("companyName")} />
-          </Field>
           <ImageField
             label="Logo image"
             hint="defaults to the Duetti logo"
@@ -824,7 +758,7 @@ export default function EmailGenerator() {
             max={56}
             onChange={(v) => setF((prev) => ({ ...prev, logoHeight: v }))}
           />
-          <Field label="DSP" hint="pick one, or type your own below">
+          <Field label="DSP" hint="used in the headline and platform-specific fields">
             <select
               style={{ ...inputStyle, cursor: "pointer" }}
               value={DSP_NAMES.includes(f.dspName) ? f.dspName : ""}
@@ -839,7 +773,7 @@ export default function EmailGenerator() {
                 }));
               }}
             >
-              <option value="">Custom / other…</option>
+              <option value="">Select a DSP…</option>
               {DSP_NAMES.map((name) => (
                 <option key={name} value={name}>
                   {name}
@@ -847,22 +781,31 @@ export default function EmailGenerator() {
               ))}
             </select>
           </Field>
-          <Field label="DSP name" hint='used in "For {DSP}" if no logo'>
-            <input style={inputStyle} value={f.dspName} onChange={set("dspName")} />
-          </Field>
-          <ImageField
-            label="DSP logo"
-            hint="auto-filled by the dropdown above, or upload your own"
-            value={f.dspLogoUrl}
-            onChange={(v) => setF((prev) => ({ ...prev, dspLogoUrl: v }))}
-          />
-          <SizeControl
-            label="DSP logo size"
-            value={f.dspLogoHeight}
-            min={20}
-            max={80}
-            onChange={(v) => setF((prev) => ({ ...prev, dspLogoHeight: v }))}
-          />
+          <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, cursor: "pointer", fontFamily: "Nunito, sans-serif", fontSize: 13, fontWeight: 700, color: "#17422C" }}>
+            <input
+              type="checkbox"
+              checked={!!f.useDspLogo}
+              onChange={(e) => setF((prev) => ({ ...prev, useDspLogo: e.target.checked }))}
+            />
+            Show DSP logo (otherwise shows "For {"{DSP}"}" as text)
+          </label>
+          {f.useDspLogo && (
+            <>
+              <ImageField
+                label="DSP logo"
+                hint="auto-filled by the dropdown above, or upload your own"
+                value={f.dspLogoUrl}
+                onChange={(v) => setF((prev) => ({ ...prev, dspLogoUrl: v }))}
+              />
+              <SizeControl
+                label="DSP logo size"
+                value={f.dspLogoHeight}
+                min={20}
+                max={80}
+                onChange={(v) => setF((prev) => ({ ...prev, dspLogoHeight: v }))}
+              />
+            </>
+          )}
           <div style={{ display: "flex", gap: 14 }}>
             <div style={{ flex: 1 }}>
               <Field label="Primary color">
@@ -881,26 +824,6 @@ export default function EmailGenerator() {
               </Field>
             </div>
           </div>
-          <Field label="Subject line" hint={`${f.subjectLine.length} chars`}>
-            <input style={inputStyle} value={f.subjectLine} onChange={set("subjectLine")} />
-          </Field>
-          <Field label="Preheader" hint={`${f.preheaderText.length} chars`}>
-            <input style={inputStyle} value={f.preheaderText} onChange={set("preheaderText")} />
-          </Field>
-
-          <SectionTitle>Message</SectionTitle>
-          <Field label="Contact name" hint="** for bold **">
-            <input style={inputStyle} value={f.contactName} onChange={set("contactName")} />
-          </Field>
-          <Field label="Intro paragraph" hint="new line = new paragraph, ** for bold **">
-            <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 110 }} value={f.introText} onChange={set("introText")} />
-          </Field>
-          <Field label="Closing line">
-            <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 50 }} value={f.closingText} onChange={set("closingText")} />
-          </Field>
-          <Field label="Your name (signature)">
-            <input style={inputStyle} value={f.senderName} onChange={set("senderName")} />
-          </Field>
 
           <SectionTitle>Releases</SectionTitle>
           {f.releases.map((r, i) => (
@@ -951,51 +874,14 @@ export default function EmailGenerator() {
             </button>
           </div>
 
-          <div style={{ border: "1px solid #E3E0D5", borderRadius: "10px 10px 0 0", background: "#FFFFFF", overflow: "hidden" }}>
-            <div style={{ padding: "8px 14px", background: "#F1F0E9", borderBottom: "1px solid #E3E0D5", fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, color: "#9AA69E" }}>
-              gmail inbox preview — {view}
-            </div>
-            {view === "desktop" ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px" }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: f.primaryColor, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: f.accentColor, fontSize: 12, fontWeight: 700 }}>
-                  {(f.companyName || "?").slice(0, 1).toUpperCase()}
-                </div>
-                <div style={{ width: 150, flexShrink: 0, fontFamily: "Arial, sans-serif", fontSize: 13.5, fontWeight: 700, color: "#202124", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {f.companyName}
-                </div>
-                <div style={{ flex: 1, fontFamily: "Arial, sans-serif", fontSize: 13.5, color: "#202124", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  <span style={{ fontWeight: 700 }}>{preSub}</span>
-                  <span style={{ color: "#5f6368" }}> {" – "}{prePre.slice(0, 100)}</span>
-                </div>
-                <div style={{ fontFamily: "Arial, sans-serif", fontSize: 12, color: "#5f6368", flexShrink: 0 }}>2:14 PM</div>
-              </div>
-            ) : (
-              <div style={{ padding: "12px 16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: f.primaryColor, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: f.accentColor, fontSize: 10, fontWeight: 700 }}>
-                    {(f.companyName || "?").slice(0, 1).toUpperCase()}
-                  </div>
-                  <div style={{ fontFamily: "Arial, sans-serif", fontSize: 13, fontWeight: 700, color: "#202124" }}>{f.companyName}</div>
-                  <div style={{ marginLeft: "auto", fontFamily: "Arial, sans-serif", fontSize: 11.5, color: "#5f6368" }}>2:14 PM</div>
-                </div>
-                <div style={{ fontFamily: "Arial, sans-serif", fontSize: 13, fontWeight: 700, color: "#202124", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {preSub}
-                </div>
-                <div style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, color: "#5f6368", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {prePre.slice(0, 40)}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div style={{ border: "1px solid #E3E0D5", borderTop: "none", borderRadius: "0 0 10px 10px", background: "#EDEAE0", padding: 18, display: "flex", justifyContent: "center" }}>
+          <div style={{ border: "1px solid #E3E0D5", borderRadius: 10, background: "#EDEAE0", padding: 18, display: "flex", justifyContent: "center" }}>
             <div style={{ width: view === "desktop" ? 640 : 375, transition: "width 0.2s ease", boxShadow: "0 6px 24px rgba(23,66,44,0.14)", borderRadius: view === "mobile" ? 18 : 4, overflow: "hidden", background: "#fff" }}>
               <iframe title="email-preview" srcDoc={previewHtml} style={{ width: "100%", height: 760, border: "none", display: "block" }} />
             </div>
           </div>
 
           <div style={{ marginTop: 12, fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#8A9691", lineHeight: 1.5 }}>
-            Maax Unicase is embedded for the "For {"{DSP}"}" headline — it'll show on Gmail desktop web, and fall back to bold uppercase Arial on the Gmail mobile app (which doesn't support custom fonts). Nunito loads from Google Fonts with the same fallback behavior. Either way the layout, spacing, and colors stay identical.
+            Maax Unicase is embedded for the company logo's text fallback — it'll show on Gmail desktop web, and fall back to bold uppercase Arial on the Gmail mobile app (which doesn't support custom fonts). Nunito loads from Google Fonts with the same fallback behavior. Either way the layout, spacing, and colors stay identical.
           </div>
         </div>
       </div>
