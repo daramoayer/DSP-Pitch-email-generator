@@ -56,6 +56,62 @@ const escapeHtml = (str = "") =>
 
 const escapeAttr = (str = "") => escapeHtml(str).replace(/\n/g, " ");
 
+// Minimal CSV parser (no dependency) — handles quoted fields, commas and
+// newlines inside quotes, and escaped "" quotes. Returns an array of rows,
+// each row an array of raw string cells.
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field);
+      field = "";
+    } else if (c === "\n") {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else if (c === "\r") {
+      // ignore — \n (above) ends the row
+    } else {
+      field += c;
+    }
+  }
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
+const normalizeHeader = (h = "") => h.trim().toLowerCase();
+
+// Rewrites a Google Drive "share" link (file/d/ID/view or open?id=ID) into
+// a direct-viewable image URL. The file still needs to be shared as
+// "Anyone with the link" for this to actually load in an email client.
+function toDirectImageUrl(url = "") {
+  const trimmed = url.trim();
+  const m = trimmed.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
+  if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+  return trimmed;
+}
+
 // escape first, then turn **bold** into <strong> so copy typed in the
 // form (e.g. "Hey **[Contact Name]**,") can carry emphasis into the email
 const richText = (str = "") =>
@@ -320,7 +376,7 @@ const blankRelease = () => ({
   coverArtWidth: 50,
   genre: "",
   releaseDate: "",
-  label: "",
+  label: "Duetti",
   upc: "",
   isrc: "",
   spotifyUri: "",
@@ -643,6 +699,11 @@ export default function EmailGenerator() {
   const [f, setF] = useState(initial);
   const [view, setView] = useState("desktop");
   const [copied, setCopied] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState(
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUg_YplMBbL6rmZjFHCY7HGuj-BCJlfTj8f-Yrr4uS-5oF45zuV-CpJpPmI8XBV4NINF-MAtyJCvzO/pub?gid=0&single=true&output=csv"
+  );
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null); // { type: "error" | "success", text }
 
   const set = (k) => (e) => setF((prev) => ({ ...prev, [k]: e.target.value }));
 
@@ -675,6 +736,54 @@ export default function EmailGenerator() {
     }));
 
   const removeRelease = (id) => setF((prev) => ({ ...prev, releases: prev.releases.filter((r) => r.id !== id) }));
+
+  const syncFromSheet = async () => {
+    setSyncing(true);
+    setSyncMessage(null);
+    try {
+      const proxied = `/api/sheet?url=${encodeURIComponent(sheetUrl)}&_=${Date.now()}`;
+      const res = await fetch(proxied);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Sheet fetch failed (${res.status})`);
+      }
+      const text = await res.text();
+      const rows = parseCsv(text).filter((r) => r.some((cell) => cell.trim() !== ""));
+      if (rows.length < 2) throw new Error("Row 2 is empty — add a track to the sheet first.");
+
+      const headerRow = rows[0].map(normalizeHeader);
+      const dataRow = rows[1];
+      const col = (name) => {
+        const idx = headerRow.indexOf(normalizeHeader(name));
+        return idx === -1 ? "" : (dataRow[idx] || "").trim();
+      };
+
+      const newRelease = {
+        id: `r${Date.now()}`,
+        title: col("Release Title"),
+        artist: col("Artist Name"),
+        album: "",
+        coverArtUrl: toDirectImageUrl(col("Cover Art")),
+        coverArtWidth: 50,
+        genre: col("Genre/Mood"),
+        releaseDate: col("Release Dates"),
+        label: "Duetti",
+        upc: col("UPC"),
+        isrc: col("ISRC"),
+        spotifyUri: col("Spotify Album URI/Track URI"),
+        appleId: col("Apple ID/Track Apple ID"),
+        description: col("Elevator Pitch (500 Words Max)"),
+        links: [{ id: `l${Date.now()}`, label: "Listening link", url: col("Listening Link") }],
+      };
+
+      setF((prev) => ({ ...prev, releases: [...prev.releases, newRelease] }));
+      setSyncMessage({ type: "success", text: `Imported "${newRelease.title || "(untitled)"}" from row 2.` });
+    } catch (e) {
+      setSyncMessage({ type: "error", text: e.message || "Could not sync from sheet." });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const html = useMemo(() => buildEmailHtml(f), [f]);
   const previewHtml = useMemo(() => buildEmailHtml(f, { forPreview: true }), [f]);
@@ -824,6 +933,34 @@ export default function EmailGenerator() {
               </Field>
             </div>
           </div>
+
+          <SectionTitle>Import from Sheet</SectionTitle>
+          <Field label="Published CSV link" hint="File → Share → Publish to web → CSV">
+            <input style={inputStyle} value={sheetUrl} onChange={(e) => setSheetUrl(e.target.value)} />
+          </Field>
+          <button
+            onClick={syncFromSheet}
+            disabled={syncing}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+              fontFamily: "Nunito, sans-serif", fontSize: 13, fontWeight: 700,
+              color: "#FFFFFF", background: syncing ? "#8A9691" : "#17422C",
+              border: "none", borderRadius: 8, padding: "10px 14px",
+              cursor: syncing ? "default" : "pointer", marginBottom: 8,
+            }}
+          >
+            {syncing ? "Syncing…" : "Import row 2 as a new release"}
+          </button>
+          {syncMessage && (
+            <div
+              style={{
+                fontFamily: "Nunito, sans-serif", fontSize: 12.5, marginBottom: 14,
+                color: syncMessage.type === "error" ? "#B5544A" : "#17422C",
+              }}
+            >
+              {syncMessage.text}
+            </div>
+          )}
 
           <SectionTitle>Releases</SectionTitle>
           {f.releases.map((r, i) => (
